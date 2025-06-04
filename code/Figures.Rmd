@@ -1,24 +1,27 @@
 ---
-title: "Figures"
+title: "Data cleaning and figures"
 output: html_document
 date: "2025-05-15"
 ---
 
+Project set up
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-#Read in csv
+#Set working directory
 setwd("C:/Users/uqbwil14/Dropbox/Carbon crossing borders project/Rcode_bw/CCBP/")
-Data <- read.csv("C:/Users/uqbwil14/Dropbox/Carbon crossing borders project/Data from NTU (Singapore)/Carbon_Market_Data_20250408.csv")
-```
 
-```{r}
-#Get our data into the correct format
-# Load necessary libraries
+# Load required libraries and install packages if necessary
 library(dplyr)
 library(tidyr)
 library(tidyverse)
 library(ggplot2)
 library(ggalluvial)
+```
+
+Set up dataframe
+```{r}
+#Read in csv
+Data <- read.csv("C:/Users/uqbwil14/Dropbox/Carbon crossing borders project/Data from NTU (Singapore)/Carbon_Market_Data_20250408.csv")
 
 # Ensure Sum.of.Credit.Volume is numeric (cleaning empty or non-numeric entries)
 Data_reduced <- Data %>%
@@ -78,7 +81,8 @@ df_long <- flow_df %>%
     target = factor(target, levels = unique(target))
   )
 
-
+#Create alluvial plots for flows between regions
+#Plot with labels
 p <- ggplot(df_long,
        aes(axis1 = source, axis2 = target, y = value)) +
   geom_alluvium(aes(fill = source), width = 1/12) +
@@ -96,6 +100,7 @@ p <- ggplot(df_long,
   theme_minimal() +
   ggtitle("Forest-based carbon flows between regions")
 
+#Plot without labels
 p2 <- ggplot(df_long,
        aes(axis1 = source, axis2 = target, y = value)) +
   geom_alluvium(aes(fill = source), width = 1/12) +
@@ -113,22 +118,22 @@ p2 <- ggplot(df_long,
   theme_minimal() +
   ggtitle("Forest-based carbon flows between regions")
 
-# Export to file (e.g. PNG)
+# Export to both plots
 ggsave("C:/Users/uqbwil14/Dropbox/Carbon crossing borders project/Rcode_bw/CCBP/figures/alluvial_plot_text.png", plot = p, width = 10, height = 6, dpi = 300)
 ggsave("C:/Users/uqbwil14/Dropbox/Carbon crossing borders project/Rcode_bw/CCBP/figures/alluvial_plot.png", plot = p2, width = 10, height = 6, dpi = 300)
 
-
-# Step 1: Make sure Credit.Volume is numeric
+#Create the plot for flows between countries
+# Make sure Credit.Volume is numeric
 Data_complete <- Data_diff %>%
   mutate(Credit.Volume = as.numeric(gsub(",", "", Credit.Volume)))
 
-# Step 2: Summarise and reshape to long format for alluvial plot
+# Summarise and reshape to long format for alluvial plot
 df_long_country <- Data_complete %>%
   group_by(Headquarter.Country, Project.Country) %>%
   summarise(value = sum(Credit.Volume, na.rm = TRUE), .groups = "drop") %>%
   rename(source = Headquarter.Country, target = Project.Country)
 
-# Step 3: Create the alluvial plot
+# Create the alluvial plot with labels
 p3 <- ggplot(df_long_country,
             aes(axis1 = source, axis2 = target, y = value)) +
   geom_alluvium(aes(fill = source), width = 1/12, alpha = 0.8) +
@@ -138,12 +143,11 @@ p3 <- ggplot(df_long_country,
   theme_minimal() +
   ggtitle("Forest-based carbon flows between countries")
 
-
 # Print the plot
 print(p3)
 ggsave("C:/Users/uqbwil14/Dropbox/Carbon crossing borders project/Rcode_bw/CCBP/figures/countries_text.png", plot = p3, width = 10, height = 6, dpi = 300)
 
-
+# Create the alluvial plot without labels
 p4 <- ggplot(df_long_country,
             aes(axis1 = source, axis2 = target, y = value)) +
   geom_alluvium(aes(fill = source), width = 1/12, alpha = 0.8) +
@@ -160,10 +164,8 @@ ggsave("C:/Users/uqbwil14/Dropbox/Carbon crossing borders project/Rcode_bw/CCBP/
 
 ```
 
-## Summaries
+Summaries for reporting purposes
 ```{r}
-library(dplyr)
-
 # Make sure Credit.Volume is numeric
 Data_complete <- Data_complete %>%
   mutate(Credit.Volume = as.numeric(Credit.Volume))
@@ -186,15 +188,4 @@ top_projects <- Data_complete %>%
 
 # View result
 print(top_projects)
-
-
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
-
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
