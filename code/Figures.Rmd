@@ -189,3 +189,10 @@ top_projects <- Data_complete %>%
 # View result
 print(top_projects)
 ```
+
+```{r}
+verra_projects <- subset(Data, Registry == "Verra")
+unique(verra_projects$Project.Methodologies)
+
+
+```
