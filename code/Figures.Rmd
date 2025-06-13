@@ -23,8 +23,18 @@ Set up dataframe
 #Read in csv
 Data <- read.csv("C:/Users/uqbwil14/Dropbox/Carbon crossing borders project/Data from NTU (Singapore)/Carbon_Market_Data_20250408.csv")
 
+# Define keywords that indicate forest-based carbon projects
+forest_keywords <- c("REDD", "Forest", "forest", "Reforestation", "reforestation", "Afforestation", "afforestation", "Deforestation", "deforestation", "Ecosystem Conversion", "ecosystem conversion", "Peat Swamp", "peat swamp")
+
+# Identify forest-based projects
+forest_projects_df <- Data[grepl(paste(forest_keywords, collapse = "|"), 
+                               Data$Project.Methodologies, ignore.case = TRUE), ]
+
+# Print the result
+print(forest_projects_df)
+
 # Ensure Sum.of.Credit.Volume is numeric (cleaning empty or non-numeric entries)
-Data_reduced <- Data %>%
+Data_reduced <- forest_projects_df %>%
   select(
     Headquarter.Country,
     Buyer.Continent,
@@ -197,6 +207,5 @@ print(top_projects)
 ```{r}
 verra_projects <- subset(Data, Registry == "Verra")
 unique(verra_projects$Project.Methodologies)
-
 
 ```
