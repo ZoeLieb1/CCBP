@@ -42,7 +42,20 @@ data_list <- fromJSON(data_raw, flatten = TRUE)
 
 df <- as.data.frame(data_list)
 
+#Code to convert list columns to strings
+sapply(df, class)
+
+df[] <- lapply(df, function(col) {
+  if (is.list(col)) {
+    sapply(col, toString)  # or paste(..., collapse = ",")
+  } else {
+    col
+  }
+})
+
+
 write.csv(df, "New_ICR_carbon_projects.csv", row.names = FALSE)
+
 
 
 ### Trying to flatten the data, because csv didn't work ###
