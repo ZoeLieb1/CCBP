@@ -6,6 +6,7 @@
 library(dplyr)    
 library(readr)    
 library(janitor)  
+library(tidyverse)
 
 # Step 1: Load both datasets
 ntu_data <- read_csv("/Users/zoe/Desktop/CCBP/CCBP_database/data/Carbon_Market_Data_20250408.csv")        # Large NTU dataset
@@ -50,3 +51,23 @@ head(duplicated_ids)
 
 # Step 7: Export the combined dataset
 write_csv(combined_data, "Combined_Carbon_Market_Data.csv")
+
+
+
+##### Summarising methodologies per registry ######
+
+# Summarize methodologies by registry
+methodologies_by_registry <- combined_data %>%
+  filter(!is.na(registry) & !is.na(project_methodologies)) %>%   # Remove NA values
+  group_by(registry) %>%
+  summarise(
+    project_methodologies = paste(unique(project_methodologies), collapse = ", ")
+  ) %>%
+  arrange(registry)  # Optional: alphabetize the registries
+
+# View or export
+print(methodologies_by_registry)
+
+# Optional: write to CSV
+write_csv(methodologies_by_registry, "Registry_Methodologies_Summary.csv")
+
